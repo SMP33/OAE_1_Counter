@@ -16,6 +16,8 @@ typedef struct
 	uint32_t ticksCounter;
 }ProjectApp;
 
+void loadAndWrite(void);
+
 extern ProjectApp app;
 extern void EXTI9_5_IRQHandler(void);
 

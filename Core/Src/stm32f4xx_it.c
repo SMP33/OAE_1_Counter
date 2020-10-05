@@ -217,13 +217,7 @@ void EXTI0_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
-	app.ticks=app.ticksCounter;
-	app.ticksCounter=0;
-
-	uint8_t bufSize=64;
-	char buf[bufSize];
-	sprintf(buf,"-> %lu Hz\r\n",app.ticks);
-	HAL_UART_Transmit_IT(&huart2, (uint8_t*)buf, strlen(buf));
+	loadAndWrite();
 
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
@@ -238,7 +232,6 @@ void TIM2_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
