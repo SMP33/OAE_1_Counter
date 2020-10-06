@@ -52,7 +52,7 @@
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int _write(int fd, char* ptr, int len);
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -217,19 +217,41 @@ void EXTI0_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
-	app.ticks=app.ticksCounter;
-	app.ticksCounter=0;
+
+	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_12);
+
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+
+	uint32_t data=777;
+
+	while(!LL_SPI_IsActiveFlag_RXNE(SPI1)) {}
+	    data = LL_SPI_ReceiveData8(SPI1);
 
 	uint8_t bufSize=64;
 	char buf[bufSize];
-	sprintf(buf,"-> %lu Hz\r\n",app.ticks);
-	HAL_UART_Transmit_IT(&huart2, (uint8_t*)buf, strlen(buf));
+	printf("-> %lu Hz\r\n",data);
+	//sprintf(buf,"-> %lu Hz\r\n",data);
+	//HAL_UART_Transmit_IT(&huart2, (uint8_t*)buf, strlen(buf));
 
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
 
   /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles SPI1 global interrupt.
+  */
+void SPI1_IRQHandler(void)
+{
+  /* USER CODE BEGIN SPI1_IRQn 0 */
+
+  /* USER CODE END SPI1_IRQn 0 */
+  /* USER CODE BEGIN SPI1_IRQn 1 */
+
+  /* USER CODE END SPI1_IRQn 1 */
 }
 
 /**
