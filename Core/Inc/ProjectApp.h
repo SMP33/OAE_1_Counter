@@ -12,6 +12,7 @@
 
 typedef struct
 {
+	uint8_t timeToSend;
 
 }ProjectApp;
 
