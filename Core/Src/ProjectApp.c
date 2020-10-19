@@ -8,6 +8,6 @@
 #include "ProjectApp.h"
 #include "stm32f4xx.h"
 
-ProjectApp app={0};
+ProjectApp app={0,0,0,0,0,0,0,0};
 
 
