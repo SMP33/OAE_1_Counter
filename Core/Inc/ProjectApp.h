@@ -21,7 +21,7 @@ typedef struct
 	uint8_t timeToSend;
 	uint32_t count;
 	uint8_t channel;
-	uint8_t outStr[64];
+	uint8_t outStr[128];
 
 }ProjectApp;
 
@@ -32,7 +32,7 @@ void sendCounterData();
 void startCounter();
 void stopCounter();
 
-void changeChannel(uint8_t* data);
+void changeChannel(uint8_t ch);
 void toggleSelector(Selector selector,uint8_t bit0, uint8_t bit1, uint8_t bit2);
 
 uint8_t getBit(uint16_t value, uint8_t bit);

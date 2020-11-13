@@ -116,7 +116,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
+	changeChannel(1);
 	while (1) {
 
 		appTick();
