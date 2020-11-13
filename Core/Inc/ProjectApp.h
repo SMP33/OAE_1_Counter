@@ -13,8 +13,7 @@
 typedef struct
 {
 	uint8_t timeToSend;
-	uint32_t channel[4];
-	uint32_t higthBits[4];
+	uint32_t count;
 
 }ProjectApp;
 
