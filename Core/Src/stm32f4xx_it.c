@@ -205,8 +205,7 @@ void TIM8_BRK_TIM12_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM8_BRK_TIM12_IRQn 0 */
 	app.timeToSend=1;
-
-	HAL_TIM_Base_Stop(&htim2);
+	stopCounter();
 
   /* USER CODE END TIM8_BRK_TIM12_IRQn 0 */
   HAL_TIM_IRQHandler(&htim12);
