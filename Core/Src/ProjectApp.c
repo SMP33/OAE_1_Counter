@@ -12,14 +12,20 @@ ProjectApp app = { 0, 0, 0 };
 
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim12;
+extern UART_HandleTypeDef huart2;
 
 HAL_StatusTypeDef HAL_TIM_Base_Start(TIM_HandleTypeDef *htim);
 HAL_StatusTypeDef HAL_TIM_Base_Start_IT(TIM_HandleTypeDef *htim);
 HAL_StatusTypeDef HAL_TIM_Base_Stop(TIM_HandleTypeDef *htim);
 
 void appTick() {
-	if (app.timeToSend) {
-		sendCounterData();
+	if(app.state==START_MEASURMENTS)
+	{
+		changeChannel(1);
+
+	} else if (app.timeToSend) {
+		nextState();
+
 	}
 }
 
@@ -31,16 +37,30 @@ void startCounter() {
 	HAL_TIM_Base_Start_IT(&htim12);
 }
 
-void sendCounterData() {
+void nextState() {
 
-	app.timeToSend = 0;
-	app.count = htim2.Instance->CNT;
+	stopCounter();
+	HAL_TIM_Base_Stop_IT(&htim12);
 
-	sprintf(app.outStr, "Ch %u: %lu Hz\r\n", app.channel, app.count);
+	app.timeToSend=0;
+	app.count= htim2.Instance->CNT;
+	app.ticks[app.state-1]=app.count;
+
+	sprintf(app.outStr, "Ch %u: %lu Hz\r\n", app.state, app.count);
 	CDC_Transmit_FS(app.outStr, strlen(app.outStr));
 	HAL_Delay(1e1);
 
-	startCounter();
+	app.state++;
+	if(app.state>CHANNELS_COUNT){
+		app.state=0;
+		sprintf(app.outStr,"Stop measurments\n");
+		CDC_Transmit_FS(app.outStr, strlen(app.outStr));
+		HAL_Delay(1e1);
+	} else {
+		changeChannel(app.state);
+	}
+
+
 }
 
 void stopCounter() {
@@ -48,25 +68,22 @@ void stopCounter() {
 }
 
 void changeChannel(uint8_t ch) {
-	stopCounter();
-	HAL_TIM_Base_Stop_IT(&htim12);
 
-	app.channel = ch - 48;
-	if (app.channel > 8 || app.channel < 1) {
-		app.channel = 1;
-	}
+	app.state = ch;
 
-	uint8_t bit0 = getBit(app.channel - 1, 0);
-	uint8_t bit1 = getBit(app.channel - 1, 1);
-	uint8_t bit2 = getBit(app.channel - 1, 2);
+	uint8_t bit0 = getBit(app.state - 1, 0);
+	uint8_t bit1 = getBit(app.state - 1, 1);
+	uint8_t bit2 = getBit(app.state - 1, 2);
 
 	toggleSelector(Selector_0, bit0, bit1, bit2);
 	toggleSelector(Selector_1, bit0, bit1, bit2);
 
-	sprintf(app.outStr, "\nChannel %u was selected!\nBits: %u%u%u\n\n", app.channel,bit2,bit1,bit0);
-
-	CDC_Transmit_FS(app.outStr, strlen(app.outStr));
-
+	//sprintf(app.outStr, "\nChannel %u was selected!\nBits: %u%u%u\n\n", app.state,bit2,bit1,bit0);
+	if(ch==1){
+		sprintf(app.outStr, "\nStart measurments:\n");
+			CDC_Transmit_FS(app.outStr, strlen(app.outStr));
+			HAL_Delay(1e1);
+	}
 	startCounter();
 }
 

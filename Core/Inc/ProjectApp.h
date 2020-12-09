@@ -8,6 +8,9 @@
 #ifndef INC_PROJECTAPP_H_
 #define INC_PROJECTAPP_H_
 
+#define CHANNELS_COUNT 8
+#define START_MEASURMENTS (CHANNELS_COUNT+1)
+
 #include "stdint.h"
 
 typedef enum
@@ -20,7 +23,8 @@ typedef struct
 {
 	uint8_t timeToSend;
 	uint32_t count;
-	uint8_t channel;
+	uint32_t ticks[CHANNELS_COUNT];
+	uint8_t state;
 	uint8_t outStr[128];
 
 }ProjectApp;
@@ -28,7 +32,7 @@ typedef struct
 extern ProjectApp app;
 
 void appTick();
-void sendCounterData();
+void nextState();
 void startCounter();
 void stopCounter();
 
