@@ -19,14 +19,20 @@ HAL_StatusTypeDef HAL_TIM_Base_Start_IT(TIM_HandleTypeDef *htim);
 HAL_StatusTypeDef HAL_TIM_Base_Stop(TIM_HandleTypeDef *htim);
 
 void appTick() {
-	if(app.state==START_MEASURMENTS)
+	if(app.state==START_MEASUREMENTS)
 	{
 		changeChannel(1);
-
 	} else if (app.timeToSend) {
-		nextState();
+		nextMeasurement();
 
 	}
+}
+
+void startMeasurement()
+{
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+	app.state=START_MEASUREMENTS;
 }
 
 void startCounter() {
@@ -37,7 +43,25 @@ void startCounter() {
 	HAL_TIM_Base_Start_IT(&htim12);
 }
 
-void nextState() {
+void transmitAppData()
+{
+	sprintf(app.outStr,"\n1. %d\n2. %d\n3. %d\n4. %d\n5. %d\n6. %d\n7. %d\n8. %d\n Stop measurements\n",
+			app.ticks[0],app.ticks[1],app.ticks[2],app.ticks[3],
+			app.ticks[4],app.ticks[4],app.ticks[6],app.ticks[7]);
+	CDC_Transmit_FS(app.outStr, strlen(app.outStr));
+	HAL_Delay(1e2);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+
+	HAL_GPIO_WritePin(LTR_TRG_OUT_GPIO_Port, LTR_TRG_OUT_Pin, GPIO_PIN_SET);
+	HAL_Delay(1e1);
+	HAL_GPIO_WritePin(LTR_TRG_OUT_GPIO_Port, LTR_TRG_OUT_Pin, GPIO_PIN_RESET);
+
+	HAL_UART_Transmit(&huart2, app.ticks, sizeof(uint32_t)*CHANNELS_COUNT, 1e3);
+}
+
+void nextMeasurement() {
 
 	stopCounter();
 	HAL_TIM_Base_Stop_IT(&htim12);
@@ -46,16 +70,15 @@ void nextState() {
 	app.count= htim2.Instance->CNT;
 	app.ticks[app.state-1]=app.count;
 
-	sprintf(app.outStr, "Ch %u: %lu Hz\r\n", app.state, app.count);
+	//sprintf(app.outStr, "Ch %u: %lu Hz\r\n", app.state, app.count);
+	sprintf(app.outStr, "\b\b\b%d/8", app.state);
 	CDC_Transmit_FS(app.outStr, strlen(app.outStr));
 	HAL_Delay(1e1);
 
 	app.state++;
 	if(app.state>CHANNELS_COUNT){
 		app.state=0;
-		sprintf(app.outStr,"Stop measurments\n");
-		CDC_Transmit_FS(app.outStr, strlen(app.outStr));
-		HAL_Delay(1e1);
+		transmitAppData();
 	} else {
 		changeChannel(app.state);
 	}
@@ -80,7 +103,7 @@ void changeChannel(uint8_t ch) {
 
 	//sprintf(app.outStr, "\nChannel %u was selected!\nBits: %u%u%u\n\n", app.state,bit2,bit1,bit0);
 	if(ch==1){
-		sprintf(app.outStr, "\nStart measurments:\n");
+		sprintf(app.outStr, "\nStart measurements:    ");
 			CDC_Transmit_FS(app.outStr, strlen(app.outStr));
 			HAL_Delay(1e1);
 	}
