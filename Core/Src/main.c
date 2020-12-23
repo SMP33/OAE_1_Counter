@@ -332,8 +332,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : LTR_TRG_IN_Pin */
   GPIO_InitStruct.Pin = LTR_TRG_IN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(LTR_TRG_IN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LTR_TRG_OUT_Pin */
@@ -379,10 +379,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
 }
 

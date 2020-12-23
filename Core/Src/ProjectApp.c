@@ -19,10 +19,28 @@ HAL_StatusTypeDef HAL_TIM_Base_Start_IT(TIM_HandleTypeDef *htim);
 HAL_StatusTypeDef HAL_TIM_Base_Stop(TIM_HandleTypeDef *htim);
 
 void appTick() {
+	int flag = 0;
 	if (app.state == START_MEASUREMENTS) {
 		changeChannel(1);
 	} else if (app.timeToSend) {
 		nextMeasurement();
+	} else if (app.state == 0) {
+
+		//Детектим запрос
+		if (HAL_GPIO_ReadPin(LTR_TRG_IN_GPIO_Port, LTR_TRG_IN_Pin)) {
+			flag = 1;
+			for (int i = 0; i < 5; i++) {
+				HAL_Delay(1);
+				if (!HAL_GPIO_ReadPin(LTR_TRG_IN_GPIO_Port, LTR_TRG_IN_Pin)) {
+					break;
+				}
+			}
+
+			if (flag) {
+				startMeasurement();
+			}
+
+		}
 
 	}
 }
@@ -56,14 +74,21 @@ void transmitAppData() {
 	HAL_Delay(1e1);
 	HAL_GPIO_WritePin(LTR_TRG_OUT_GPIO_Port, LTR_TRG_OUT_Pin, GPIO_PIN_RESET);
 
-	HAL_Delay(5e2);
-	HAL_UART_Transmit(&huart2, app.ticks, sizeof(uint32_t)*2, 1e3);
-	HAL_Delay(1e2);
-	HAL_UART_Transmit(&huart2, app.ticks+2, sizeof(uint32_t)*2, 1e3);
-	HAL_Delay(1e2);
-	HAL_UART_Transmit(&huart2, app.ticks+4, sizeof(uint32_t)*2, 1e3);
-	HAL_Delay(1e2);
-	HAL_UART_Transmit(&huart2, app.ticks+6, sizeof(uint32_t)*2, 1e3);
+	for (int i = 0; i < 8; i++) {
+		uint32_t c = (10 * (i));
+		app.ticks[i] = (c + 1) << 24 | (c + 2) << 16 | (c + 3) << 8 | (c + 4);
+	}
+
+	uint32_t transDelay=3e2;
+
+	HAL_Delay(transDelay);
+	HAL_UART_Transmit(&huart2, app.ticks, sizeof(uint32_t) * 2, 1e3);
+	HAL_Delay(transDelay);
+	HAL_UART_Transmit(&huart2, app.ticks + 2, sizeof(uint32_t) * 2, 1e3);
+	HAL_Delay(transDelay);
+	HAL_UART_Transmit(&huart2, app.ticks + 4, sizeof(uint32_t) * 2, 1e3);
+	HAL_Delay(transDelay);
+	HAL_UART_Transmit(&huart2, app.ticks + 6, sizeof(uint32_t) * 2, 1e3);
 }
 
 void nextMeasurement() {
