@@ -56,23 +56,14 @@ void transmitAppData() {
 	HAL_Delay(1e1);
 	HAL_GPIO_WritePin(LTR_TRG_OUT_GPIO_Port, LTR_TRG_OUT_Pin, GPIO_PIN_RESET);
 
-	uint16_t data[8];
-	for (int i = 0; i < 8; i++) {
-		data[i] = 3+i;
-	}
-
-	HAL_Delay(1e3);
-	HAL_UART_Transmit(&huart2, data, 8, 1e3);
 	HAL_Delay(5e2);
-	HAL_UART_Transmit(&huart2, ((uint16_t*) data) + 4, 8, 1e3);
-
-	//HAL_UART_Transmit(&huart2, app.ticks, sizeof(uint32_t)*2, 1e3);
-	HAL_Delay(5e2);
-	//HAL_UART_Transmit(&huart2, app.ticks+2, sizeof(uint32_t)*2, 1e3);
-	HAL_Delay(5e2);
-	//HAL_UART_Transmit(&huart2, app.ticks+4, sizeof(uint32_t)*2, 1e3);
-	HAL_Delay(5e2);
-	//HAL_UART_Transmit(&huart2, app.ticks+6, sizeof(uint32_t)*2, 1e3);
+	HAL_UART_Transmit(&huart2, app.ticks, sizeof(uint32_t)*2, 1e3);
+	HAL_Delay(1e2);
+	HAL_UART_Transmit(&huart2, app.ticks+2, sizeof(uint32_t)*2, 1e3);
+	HAL_Delay(1e2);
+	HAL_UART_Transmit(&huart2, app.ticks+4, sizeof(uint32_t)*2, 1e3);
+	HAL_Delay(1e2);
+	HAL_UART_Transmit(&huart2, app.ticks+6, sizeof(uint32_t)*2, 1e3);
 }
 
 void nextMeasurement() {
