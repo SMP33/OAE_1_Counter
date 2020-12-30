@@ -74,10 +74,10 @@ void transmitAppData() {
 	HAL_Delay(1e1);
 	HAL_GPIO_WritePin(LTR_TRG_OUT_GPIO_Port, LTR_TRG_OUT_Pin, GPIO_PIN_RESET);
 
-	for (int i = 0; i < 8; i++) {
-		uint32_t c = (10 * (i));
-		app.ticks[i] = (c + 1) << 24 | (c + 2) << 16 | (c + 3) << 8 | (c + 4);
-	}
+//	for (int i = 0; i < 8; i++) {
+//		uint32_t c = (10 * (i));
+//		app.ticks[i] = (c + 1) << 24 | (c + 2) << 16 | (c + 3) << 8 | (c + 4);
+//	}
 
 	uint32_t transDelay=3e2;
 
