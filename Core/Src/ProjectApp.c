@@ -79,6 +79,7 @@ void transmitAppData() {
 //		app.ticks[i] = (c + 1) << 24 | (c + 2) << 16 | (c + 3) << 8 | (c + 4);
 //	}
 
+
 	uint32_t transDelay=3e2;
 
 	HAL_Delay(transDelay);
